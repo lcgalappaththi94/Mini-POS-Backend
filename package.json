@@ -1,0 +1,25 @@
+{
+  "name": "posbackend",
+  "version": "0.0.0",
+  "private": false,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest",
+    "cookie-parser": "latest",
+    "debug": "latest",
+    "ejs": "latest",
+    "express": "latest",
+    "http-errors": "latest",
+    "morgan": "latest",
+    "mysql": "latest",
+    "express-session": "latest",
+    "bcrypt-nodejs": "latest",
+    "body-parser": "latest",
+    "cors": "latest",
+    "sequelize": "latest",
+    "mysql2": "latest"
+  }
+}
