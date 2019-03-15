@@ -143,7 +143,7 @@ app.post('/orders/:order_id/products/:product_id', function (req, res) {
                     OrderProduct.create({
                         orderId: [req.params.order_id],
                         productId: [req.params.product_id],
-                        numItems: 1
+                        numItems: requestBody.numItems
                     }).then(orderProduct => {
                         res.send(orderProduct);
                     });
