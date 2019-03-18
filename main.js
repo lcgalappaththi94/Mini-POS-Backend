@@ -44,7 +44,8 @@ app.get('/user/:user_id/orders', function (req, res) {
         where: {
             userId: [req.params.user_id]
         },
-        include: [{model: Product}]
+        include: [{model: Product}],
+        order: [['id', 'DESC']]
     }).then(user => {
         res.send(user);
     });
