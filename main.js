@@ -107,7 +107,8 @@ app.delete('/orders/:order_id/products/:product_id', function (req, res) {
         }
     }).then(product => {
         if (product) {
-            product.update(requestBody, {fields: ['availability']}).then(result => {
+            let payload = {availability: parseInt(product.availability + requestBody.availability)};
+            product.update(payload, {fields: ['availability']}).then(result => {
                 if (result.id) {
                     OrderProduct.findOne({
                         where: {
@@ -116,7 +117,7 @@ app.delete('/orders/:order_id/products/:product_id', function (req, res) {
                         }
                     }).then(orderProduct => {
                         if (orderProduct) {
-                            orderProduct.destroy().then(result => res.send(result));
+                            orderProduct.destroy().then(result => res.send(payload));
                         } else {
                             res.send('{}');
                         }
@@ -139,19 +140,26 @@ app.post('/orders/:order_id/products/:product_id', function (req, res) {
         }
     }).then(product => {
         if (product) {
-            product.update(requestBody, {fields: ['availability']}).then(result => {
-                if (result.id) {
-                    OrderProduct.create({
-                        orderId: [req.params.order_id],
-                        productId: [req.params.product_id],
-                        numItems: requestBody.numItems
-                    }).then(orderProduct => {
-                        res.send(orderProduct);
-                    });
-                } else {
-                    res.send('{}');
-                }
-            });
+            if (product.availability >= parseInt(requestBody.availability)) {
+                let availability = parseInt(product.availability - requestBody.availability);
+                let payload = {availability: availability};
+                product.update(payload, {fields: ['availability']}).then(result => {
+                    if (result.id) {
+                        OrderProduct.create({
+                            orderId: [req.params.order_id],
+                            productId: [req.params.product_id],
+                            numItems: parseInt(requestBody.availability)
+                        }).then(orderProduct => {
+                            res.send(payload);
+                        });
+                    } else {
+                        res.send('{}');
+                    }
+                });
+            } else {
+                let payload = {availability: parseInt(-1 * product.availability)};
+                res.send(payload);
+            }
         } else {
             res.send('{}');
         }
@@ -166,24 +174,52 @@ app.patch('/orders/:order_id/products/:product_id', function (req, res) {
         }
     }).then(product => {
         if (product) {
-            product.update(requestBody, {fields: ['availability']}).then(result => {
-                if (result.id) {
-                    OrderProduct.findOne({
-                        where: {
-                            orderId: [req.params.order_id],
-                            productId: [req.params.product_id]
-                        }
-                    }).then(orderProduct => {
-                        if (orderProduct) {
-                            orderProduct.update(requestBody, {fields: ['numItems']}).then(result => res.send(result));
+            let availability = parseInt(product.availability - parseInt(requestBody.availability));
+            let payload = {availability: availability};
+            if (parseInt(requestBody.availability) === 1) {
+                if (product.availability >= parseInt(requestBody.availability)) {
+                    product.update(payload, {fields: ['availability']}).then(result => {
+                        if (result.id) {
+                            OrderProduct.findOne({
+                                where: {
+                                    orderId: [req.params.order_id],
+                                    productId: [req.params.product_id]
+                                }
+                            }).then(orderProduct => {
+                                if (orderProduct) {
+                                    orderProduct.update(requestBody, {fields: ['numItems']}).then(result => res.send(payload));
+                                } else {
+                                    res.send('{}');
+                                }
+                            });
                         } else {
                             res.send('{}');
                         }
                     });
                 } else {
-                    res.send('{}');
+                    let payload = {availability: parseInt(product.availability)};
+                    res.send(payload);
                 }
-            });
+            } else {
+                product.update(payload, {fields: ['availability']}).then(result => {
+                    if (result.id) {
+                        OrderProduct.findOne({
+                            where: {
+                                orderId: [req.params.order_id],
+                                productId: [req.params.product_id]
+                            }
+                        }).then(orderProduct => {
+                            if (orderProduct) {
+                                orderProduct.update(requestBody, {fields: ['numItems']}).then(result => res.send(payload));
+                            } else {
+                                res.send('{}');
+                            }
+                        });
+                    } else {
+                        res.send('{}');
+                    }
+                });
+            }
         } else {
             res.send('{}');
         }
