@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('myPos', 'root', '12345678', {
-    host: 'localhost',
+const sequelize = new Sequelize('my_pos', 'root_lcg', '12345678', {
+    host: 'db4free.net',
     dialect: 'mysql',
     operatorsAliases: false,
     pool: {
